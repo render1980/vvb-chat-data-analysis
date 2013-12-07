@@ -4,46 +4,46 @@
 import re
 import psycopg2
 
-class VVBAdapter:
+class VVBPgAdapter:
 	"""
 	Class for simple CRUD and more complex operations with database
 
  	def save_lines : method for save Skype format messages in db	
-	
 	"""
 	
 	def __init__(self, conn_str):
 		self.conn = psycopg2.connect(conn_str)
 
-	# HELP METHODS
-	def __parse_line(self, line):
-		m = re.match(u"^\W(\d+).(\d+).(\d+)\W\s(\d+:\d+:\d+)\W\s([\S\s]+?):\s([\s\S]+)", line)
-		if m:
-			return ("20" + m.group(3) + "-" + m.group(2) + "-" + m.group(1) + " " + m.group(4),
-					m.group(5),
-					m.group(6))
-	# MODEL LOGIC
-	def save_line(self, groups, cur):
-		if groups:
-			cur.execute('insert into vvb.records (rectime, nick, message) values (%s, %s, %s)', 
-					(groups[0], groups[1], groups[2]))
-	#else:
-	#	err_lines.append(line)
+	# ---
+	def __save_record(self, line, cur):
+		if line:
+			cur.execute('insert into vvb.records (rectime, nick, message) values (%s, %s, %s)',
+				(line[0], line[1], line[2]))
 
-	def save(self, file_name):
-		# open postgre connection =>
+	def save(self, lines):
 		cur = self.conn.cursor()
-		
-		FILE_IN = open(file_name, 'r')
-		data = FILE_IN.read()
-		FILE_IN.close()
-		# normalize text structure
-		data = data.replace('\n', ' ').replace('[', '\n[').replace('> \n', '> ').replace(': \n[', ': [')
-		lines = data.split('\n')
-
 		for line in lines:
-			groups = self.__parse_line(line)
-			self.save_line(groups, cur)
+			self.__save_record(line, cur)
 		self.conn.commit()
 		cur.close()
+
+	# ---
+	def __read(self, query):
+		cur = self.conn.cursor()
+		cur.execute(query)
+		return cur.fetchall()
+
+	def read_all(self):
+		return self.__read("select * from vvb.records")
+
+	def read_by_date_range(self, from_date, to_date):
+		return self.__read("select * from vvb.records where rectime between '%s' and '%s'" \
+			%(from_date, to_date))
+
+	def read_by_nick(self, nick):
+		return self.__read("select * from vvb.records where nick = '%s'" % nick)	
+
+	# ---
+	def close(self):
+		self.conn.cursor().close()
 		self.conn.close()
