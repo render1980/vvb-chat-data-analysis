@@ -14,7 +14,7 @@ class VVBPgAdapter:
 	def __init__(self, conn_str):
 		self.conn = psycopg2.connect(conn_str)
 
-	# ---
+	# --- SAVE --- #
 	def __save_record(self, line, cur):
 		if line:
 			cur.execute('insert into vvb.records (rectime, nick, message) values (%s, %s, %s)',
@@ -27,7 +27,7 @@ class VVBPgAdapter:
 		self.conn.commit()
 		cur.close()
 
-	# ---
+	# --- READ --- #
 	def __read(self, query):
 		cur = self.conn.cursor()
 		cur.execute(query)
@@ -43,7 +43,7 @@ class VVBPgAdapter:
 	def read_by_nick(self, nick):
 		return self.__read("select * from vvb.records where nick = '%s'" % nick)	
 
-	# ---
+	# --- CLOSE --- #
 	def close(self):
 		self.conn.cursor().close()
 		self.conn.close()

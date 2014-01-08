@@ -32,8 +32,10 @@ class VVBParser:
 		# normalize text structure
 		data = data.replace('\n', ' ').replace('[', '\n[').replace('> \n', '> ').replace(': \n[', ': [')
 		lines = data.split('\n')
-
 		for line in lines:
 			groups = self.__parse_line(line)
 			self.__save_line(groups)
 		return self.records
+
+# Main workflow #
+lines = VVBParser().parse('./data/vvb_chat_hist.txt')
