@@ -3,6 +3,7 @@
 
 import re
 import csv
+import os
 
 class VVBParser:
 	"""
@@ -45,5 +46,7 @@ class VVBParser:
 
 # Main workflow #
 parser = VVBParser()
-lines = parser.parse('./in/vvb_chat_hist.txt')
-parser.save_to_csv(lines, './out/vvb_chat_hist.csv')
+for file in os.listdir("./in"):
+	file_name = os.path.splitext(file)[0]
+	lines = parser.parse('./in/' + file)
+	parser.save_to_csv(lines, './out/' + file_name  + '.csv')
