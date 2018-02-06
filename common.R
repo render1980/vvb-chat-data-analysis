@@ -1,4 +1,4 @@
-records <- read.csv("/Users/fungus/Documents/test/python/vvb-chat-data-analysis/out/vvb_chat_hist.csv")
+records <- read.csv("out/vvb_chat_hist.csv")
 # remove empty rows
 records <- na.omit(records)
 
@@ -14,7 +14,7 @@ count_by_nick <- function(nick) {
   nrow(subset(records, records$NICK == nick))
 }
 # Main workflow #
-count_by_nick("Jet_Людмила Аникина")
-count_by_nick("myrzomasha")
-# plot(count_by_nick("Jet_Людмила Аникина"), 
-#      count_by_nick("myrzomasha"))
+count_by_nick("?")
+count_by_nick("?")
+# plot(count_by_nick("?"), 
+#      count_by_nick("?"))
